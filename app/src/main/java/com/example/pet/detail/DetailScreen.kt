@@ -1,6 +1,9 @@
 package com.example.pet.detail
 
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,66 +36,77 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.pet.data.DummyPetDataSource
-import com.example.sharedtransition.data.Pet
+import com.example.pet.data.Pet
 import com.example.pet.home.GenderTag
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun DetailScreen(
     index: Int,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     onNavigate: () -> Unit
 ) {
-    Scaffold(topBar = {
-        TopAppBar(
-            title = { Text(text = "Detail") },
-            navigationIcon = {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(24.dp, 24.dp)
-                        .clickable {
-                            onNavigate.invoke()
-                        },
-                )
-            },
-        )
-    }) { padding ->
-        val pet = DummyPetDataSource.petList[index]
-        LazyColumn(contentPadding = padding) {
-            item {
-                Image(
-                    painter = painterResource(id = pet.image),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(346.dp),
-                    alignment = Alignment.CenterStart,
-                    contentScale = ContentScale.Crop
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                PetBasicInfoItem(
-                    name = pet.name,
-                    gender = pet.gender,
-                    location = pet.location,
-                )
-            }
+   with(sharedTransitionScope) {
+       Scaffold(topBar = {
+           TopAppBar(
+               title = { Text(text = "Detail") },
+               navigationIcon = {
+                   Icon(
+                       imageVector = Icons.Default.ArrowBack,
+                       contentDescription = null,
+                       modifier = Modifier
+                           .size(24.dp, 24.dp)
+                           .clickable {
+                               onNavigate.invoke()
+                           },
+                   )
+               },
+           )
+       }) { padding ->
+           val pet = DummyPetDataSource.petList[index]
+           LazyColumn(contentPadding = padding) {
+               item {
+                   Image(
+                       painter = painterResource(id = pet.image),
+                       contentDescription = null,
+                       modifier = Modifier
+                           .sharedElement(
+                               state = rememberSharedContentState(key = "image/${pet.id}"),
+                               animatedVisibilityScope = animatedVisibilityScope,
+                           )
+                           .fillMaxWidth()
+                           .height(346.dp),
+                       alignment = Alignment.CenterStart,
+                       contentScale = ContentScale.Crop
+                   )
+                   Spacer(modifier = Modifier.height(16.dp))
+                   PetBasicInfoItem(
+                       name = pet.name,
+                       gender = pet.gender,
+                       location = pet.location,
+                       animatedVisibilityScope = animatedVisibilityScope
+                   )
+               }
 
-            item {
-                PetInfo(pet = pet)
-            }
+               item {
+                   PetInfo(pet = pet)
+               }
 
-        }
+           }
 
 
-    }
+       }
+   }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun PetBasicInfoItem(
+fun SharedTransitionScope.PetBasicInfoItem(
     name: String,
     gender: String,
     location: String,
+    animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     Row(
         modifier = Modifier
@@ -104,7 +118,11 @@ fun PetBasicInfoItem(
             Text(
                 text = name,
                 modifier = Modifier
-                    .padding(end = 12.dp),
+                    .padding(end = 12.dp)
+                    .sharedElement(
+                        state = rememberSharedContentState(key = "text/${name}"),
+                        animatedVisibilityScope = animatedVisibilityScope,
+                    ),
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.headlineLarge
             )

@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.pet.home.Home
+import com.example.pet.navigation.MyNavigationHost
 import com.example.pet.ui.theme.PetTheme
 
 class MainActivity : ComponentActivity() {
@@ -21,11 +22,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             PetTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                   Home(
-                       modifier = Modifier.padding(innerPadding)
-                   ) {
-
-                   }
+                    MyNavigationHost(modifier = Modifier.padding(innerPadding))
                 }
             }
         }

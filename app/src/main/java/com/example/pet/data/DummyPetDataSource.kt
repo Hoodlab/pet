@@ -1,7 +1,6 @@
 package com.example.pet.data
 
 import com.example.pet.R
-import com.example.sharedtransition.data.Pet
 
 
 object DummyPetDataSource {

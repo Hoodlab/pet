@@ -1,5 +1,8 @@
 package com.example.pet.home
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,90 +33,104 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.sharedtransition.data.Pet
+import com.example.pet.data.Pet
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun PetInfoItem(
     pet: Pet,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     onPetItemClick: (Pet) -> Unit,
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .clickable(onClick = { onPetItemClick(pet) }),
-    ) {
-        Row(
+
+    with(sharedTransitionScope) {
+        Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(8.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .clickable(onClick = { onPetItemClick(pet) }),
         ) {
-            Row {
-                Image(
-                    modifier = Modifier
-                        .size(80.dp, 80.dp)
-                        .clip(RoundedCornerShape(16.dp)),
-                    painter = painterResource(id = pet.image),
-                    contentDescription = "",
-                    contentScale = ContentScale.Crop,
-                    alignment = Alignment.CenterStart
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Column(
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                ) {
-                    Text(
-                        text = pet.name,
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyLarge,
-
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row {
+                    Image(
+                        modifier = Modifier
+                            .sharedElement(
+                                state = rememberSharedContentState(key = "image/${pet.id}"),
+                                animatedVisibilityScope = animatedVisibilityScope,
+                            )
+                            .size(80.dp, 80.dp)
+                            .clip(RoundedCornerShape(16.dp)),
+                        painter = painterResource(id = pet.image),
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop,
+                        alignment = Alignment.CenterStart
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = buildString {
-                            append(pet.age)
-                            append(" | ")
-                            append(pet.breed)
-                        }, style = MaterialTheme.typography.bodySmall,
-
-                        )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(
-                        verticalAlignment = Alignment.Bottom,
-
-                        ) {
-                        Icon(
-                            imageVector = Icons.Default.LocationOn,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp, 16.dp),
-                            tint = Color.Red
-                        )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    ) {
                         Text(
-                            text = pet.location, modifier = Modifier.padding(
-                                start = 8.dp, top = 0.dp, end = 12.dp, bottom = 0.dp
-                            ), style = MaterialTheme.typography.bodySmall
+                            text = pet.name,
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.sharedElement(
+                                state = rememberSharedContentState(key = "text/${pet.name}"),
+                                animatedVisibilityScope = animatedVisibilityScope,
+                            )
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = buildString {
+                                append(pet.age)
+                                append(" | ")
+                                append(pet.breed)
+                            },
+                            style = MaterialTheme.typography.bodySmall,
+
+                            )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(
+                            verticalAlignment = Alignment.Bottom,
+
+                            ) {
+                            Icon(
+                                imageVector = Icons.Default.LocationOn,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp, 16.dp),
+                                tint = Color.Red
+                            )
+                            Text(
+                                text = pet.location, modifier = Modifier.padding(
+                                    start = 8.dp, top = 0.dp, end = 12.dp, bottom = 0.dp
+                                ), style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+
+
                     }
-
-
                 }
-            }
-            Column(
-                modifier = Modifier.height(80.dp),
-                verticalArrangement = Arrangement.SpaceBetween,
+                Column(
+                    modifier = Modifier.height(80.dp),
+                    verticalArrangement = Arrangement.SpaceBetween,
 
-                ) {
-                GenderTag(
-                    gender = pet.gender,
-                    modifier = Modifier
-                )
-                Text(
-                    text = "Adoptable",
-                    style = MaterialTheme.typography.bodySmall,
-
+                    ) {
+                    GenderTag(
+                        gender = pet.gender,
+                        modifier = Modifier
                     )
+                    Text(
+                        text = "Adoptable",
+                        style = MaterialTheme.typography.bodySmall,
+
+                        )
+                }
             }
         }
     }
