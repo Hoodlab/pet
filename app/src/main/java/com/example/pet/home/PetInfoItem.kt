@@ -67,7 +67,7 @@ fun PetInfoItem(
                     Text(
                         text = pet.name,
                         fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.headlineMedium,
+                        style = MaterialTheme.typography.bodyLarge,
 
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -137,7 +137,6 @@ fun GenderTag(gender: String, modifier: Modifier) {
             text = gender,
             modifier = Modifier.padding(12.dp, 4.dp, 12.dp, 6.dp),
             style = MaterialTheme.typography.bodySmall,
-            color = color
         )
     }
 }
